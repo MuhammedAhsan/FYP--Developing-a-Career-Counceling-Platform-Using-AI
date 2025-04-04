@@ -11,9 +11,11 @@ Follow these steps to run the application locally.
 cd to Frontend folder
 
 Then install dependencies
+
 ```npm i```
 
 Then run the frontend
+
 ```npm run dev```
 
 ## Setup Backend
@@ -26,14 +28,18 @@ Install uv if not already
 ```pip install uv```
 
 activate virtual environment
+
 ```uv venv```
 
 Run virtual environment
+
 ```.venv\scripts\activate```
 
 Install Django
+
 ```uv pip install Django```
 
 Install Django Core-Headers
+
 ```uv pip install django-cors-headers```
 
