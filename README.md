@@ -22,6 +22,7 @@ cd to Backend folder
 Setup virtual environment
 
 Install uv if not already
+
 ```pip install uv```
 
 activate virtual environment
