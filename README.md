@@ -6,7 +6,9 @@ Follow these steps to run the application locally.
 
 ## Clone the repository
 Clone the repository
-```git clone https://github.com/MuhammedAhsan/FYP--Developing-a-Career-Counceling-Platform-Using-AI.git```
+```
+git clone https://github.com/MuhammedAhsan/FYP--Developing-a-Career-Counceling-Platform-Using-AI.git
+```
 
 ## Setup Frontend
 cd to Frontend folder
@@ -30,8 +32,12 @@ venv\scripts\activate
 ```
 
 Install Django
-```uv pip install Django```
+```
+uv pip install Django
+```
 
 Install Django Core-Headers
-```uv pip install django-cors-headers```
+```
+uv pip install django-cors-headers
+```
 
