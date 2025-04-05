@@ -12,7 +12,7 @@ Clone the repository
 cd to Frontend folder
 
 Then install dependencies
-```json
+```
 npm i
 npm run dev
 ```
@@ -23,15 +23,15 @@ cd to Backend folder
 Setup virtual environment
 
 Install uv if not already
-```json
+```
 pip install uv
 uv venv
 venv\scripts\activate
 ```
 
 Install Django
-```json uv pip install Django```
+```uv pip install Django```
 
 Install Django Core-Headers
-```json uv pip install django-cors-headers```
+```uv pip install django-cors-headers```
 
