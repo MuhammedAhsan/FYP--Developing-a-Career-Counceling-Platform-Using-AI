@@ -23,8 +23,6 @@ npm run dev
 cd to Backend folder
 
 Setup virtual environment
-
-Install uv if not already
 ```
 pip install uv
 uv venv
