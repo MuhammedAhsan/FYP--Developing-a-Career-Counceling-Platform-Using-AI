@@ -1,12 +1,12 @@
 import * as React from 'react';
 import axios from 'axios';
-import { Box, Stepper, Step, StepLabel, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, Chip, Grid } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Stepper, Step, StepLabel, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, Chip, Grid, Card } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 const steps = ['Personal Detail', 'Educational Detail', 'Skills/Interests/Career Goals'];
 
-export default function App() {
+export default function ProfileForm() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   const [currentInterest, setCurrentInterest] = useState('');
@@ -14,6 +14,7 @@ export default function App() {
   const [formData, setFormData] = React.useState({
     name: '',
     email: '',
+    password: '',
     education: [{
       degree: '',
       institution: '',
@@ -25,7 +26,7 @@ export default function App() {
       level: 'Beginner'
     }],
     interests: [],
-    career_goals: ''
+    career_goals: '',
   });
 
 
@@ -165,11 +166,11 @@ export default function App() {
         {steps.map((label, index) => {
           const stepProps = {};
           const labelProps = {};
-          if (isStepOptional(index)) {
-            labelProps.optional = (
-              <Typography variant="caption">Optional</Typography>
-            );
-          }
+          // if (isStepOptional(index)) {
+          //   labelProps.optional = (
+          //     <Typography variant="caption">Optional</Typography>
+          //   );
+          // }
           if (isStepSkipped(index)) {
             stepProps.completed = false;
           }
@@ -201,8 +202,8 @@ export default function App() {
 
             {/* Personal Info */}
             {activeStep === 0 && (
-              <>
-                <Grid item xs={12} sm={6}>
+              <Box>
+                <Box>
                   <TextField
                     fullWidth
                     label="Full Name"
@@ -211,18 +212,30 @@ export default function App() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                   />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box>
                   <TextField
                     fullWidth
                     label="Email"
                     type="email"
+                    sx={{ pb: 1 }}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                   />
-                </Grid>
-              </>
+                </Box>
+                <Box>
+                  <TextField
+                    fullWidth
+                    label='Password'
+                    type='password'
+                    sx={{ pb: 1 }}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                  />
+                </Box>
+              </Box>
             )}
 
             {/* Education Section */}
@@ -364,17 +377,28 @@ export default function App() {
                 >
                   Back
                 </Button>
-                <Box sx={{ flex: '1 1 auto' }} />
+                <Box sx={{ flex: '1 1 auto' }} >
+                  <Typography variant='body2' sx={{ textAlign: 'center' }}>
+                    Already have an account?{' '}
+                    <Link 
+                      to='/login'
+                      variant='body2'
+                      sx={{ alignSelf: 'center' }}
+                    >
+                      Login
+                    </Link>
+                  </Typography>
+                </Box>
 
                 {/* Skip button */}
-                {isStepOptional(activeStep) && (
+                {/* {isStepOptional(activeStep) && (
                   <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                     Skip
                   </Button>
-                )}
+                )} */}
 
                 {/* Next - Finish Button */}
-                <Button onClick={handleNext} variant='contained' type={activeStep === steps.length - 1 ? 'submit' : 'button'}>
+                <Button onClick={activeStep < steps.length - 1 ? handleNext : undefined} variant='contained' type={activeStep === steps.length - 1 ? 'submit' : 'button'}>
                   {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                 </Button>
               </Box>
