@@ -8,6 +8,9 @@ from django.conf import settings
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer
+from langchain_ollama import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate
+
 
 csv_data = os.path.join(settings.BASE_DIR, 'dataset', 'Job_Skill_Recommendation.csv')
 job_data = pd.read_csv(csv_data)
@@ -104,3 +107,77 @@ def get_recommendations(request, email):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+
+SYSTEM_PROMPT =  """
+You are an AI Assistant with START, PLAN, ACTION, Observation and Output state.
+Wait for the user prompt and first PLAN using avaliable tools.
+After Planning, take the ACTION with apropriate tools and wait for Observation based on Action. untill observation are not given stop there.
+Once you get the observations, Return the AI response based on Start prompt and Observations.
+
+Strictly return output in only Json format as in examples.
+STRICTLY FOLLOW THE RULES
+
+Avaliable Tools:
+- function getWeatherDetails(city: string): string
+getWeatherDetails is a function that accepts city name as string and return weather detials.
+
+Example:
+{"type": "user", "user": "What is the sum of weather of lahore and karachi?"}
+{"type": "plan", "plan": "I will call the getWeatherDetails for lahore"}
+{"type": "action", "function": "getWeatherDetails", "input": "lahore"}
+{"type": "observation", "Observation": "27°C"}
+{"type": "plan", "plan": "I will call the getWeatherDetails for karachi"}
+{"type": "action", "function": "getWeatherDetails", "input": "karachi"}
+{"type": "observation", "Observation": "32°C"}
+{"type": "output", "output": "The sum of weather of lahore and karachi is 59°C"}
+
+"""
+
+tools = {
+    'getRecommendations': get_recommendations,
+}
+
+messages = [
+    {'role': 'system', 'content': SYSTEM_PROMPT},
+]
+
+
+@csrf_exempt
+def chatbot(request):
+    if request.method == 'POST':
+        try:
+            query = json.loads(request.body)
+            user_input = query.get('message')
+            # print(user_input)
+            # return HttpResponse(user_input)
+
+            # Manual validation
+            # if not user_input :
+            #     return
+            
+            model = OllamaLLM(model='llama3')
+            # messages.append(query)
+            response = model.invoke(user_input)
+            print(response)
+            return HttpResponse(response)
+            # messages.append(response)
+            # data = json.loads(response)
+            # print(data)
+
+            # while True:
+            #     if data['type'] == 'output':
+            #         print(data['output'])
+            #         break
+
+            #     elif data['type'] == 'action':
+            #         fn = tools[data['function']]
+            #         observation = fn(data['input'])
+            #         obs = {'type': 'observation', 'observation': observation}
+            #         messages.append({'role': 'developer', 'content': json.dumps(obs)})
+
+        except Exception as e:
+            return JsonResponse(
+                {'message': str(e)}, 
+                status=400
+            )
