@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -24,6 +25,18 @@ job_skill_matrix = mlb_tech.fit_transform(job_data['Technical Skills'])
 #     "Web Developer": ["JavaScript", "HTML", "CSS"],
 #     "Cybersecurity Analyst": ["Networking", "Security", "Linux"]
 # }
+=======
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import User
+
+CAREER_PATHS = {
+    "Data Scientist": ["Python", "Machine Learning", "Statistics"],
+    "Web Developer": ["JavaScript", "HTML", "CSS"],
+    "Cybersecurity Analyst": ["Networking", "Security", "Linux"]
+}
+>>>>>>> d2b4be574a6bbfa960917d50098ab4d4043d7c9a
 
 @csrf_exempt
 def create_user(request):
@@ -38,6 +51,7 @@ def create_user(request):
                     status=400
                 )
                 
+<<<<<<< HEAD
             user = {
                 "name": data['name'],
                 "email": data['email'],
@@ -48,6 +62,16 @@ def create_user(request):
                 "career_goals": data.get('career_goals', '')
             }
             users_db.insert_one(user)
+=======
+            User.objects.create(
+                name=data['name'],
+                email=data['email'],
+                education=data.get('education', []),
+                skills=data.get('skills', []),
+                interests=data.get('interests', []),
+                career_goals=data.get('career_goals', '')
+            )
+>>>>>>> d2b4be574a6bbfa960917d50098ab4d4043d7c9a
             return JsonResponse({'status': 'success'})
             
         except Exception as e:
@@ -55,6 +79,7 @@ def create_user(request):
                 {'message': str(e)}, 
                 status=400
             )
+<<<<<<< HEAD
         
 @csrf_exempt
 def get_user(request):
@@ -104,3 +129,52 @@ def get_recommendations(request, email):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+=======
+
+def get_recommendations(request, email):
+    try:
+        user = User.objects.get(email=email)
+        user_skills = [skill['name'] for skill in user.skills]
+        matches = []
+        
+        for career, skills in CAREER_PATHS.items():
+            if any(skill in user_skills for skill in skills):
+                matches.append(career)
+                
+        return JsonResponse({'recommendations': matches})
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'user not found'}, status=404)
+
+
+# def get_recommendations(request, email):
+#     try:
+#         user = User.objects.get(email=email)
+#         user_skills = [skill['name'] for skill in user.skills]
+        
+#         recommendations = []
+#         CAREER_PATHS = {
+#             "Data Scientist": ["Python", "Machine Learning", "Statistics"],
+#             "Web Developer": ["JavaScript", "HTML", "CSS"]
+#         }
+        
+#         for career, required_skills in CAREER_PATHS.items():
+#             if any(skill in user_skills for skill in required_skills):
+#                 recommendations.append({
+#                     "career": career,
+#                     "required_skills": required_skills,
+#                     "user_skills_matched": [s for s in required_skills if s in user_skills],
+#                     "skills_missing": [s for s in required_skills if s not in user_skills]
+#                 })
+
+#         return JsonResponse({
+#             'user': {
+#                 'name': user.name,
+#                 'email': user.email,
+#                 'skills': user.skills
+#             },
+#             'recommendations': recommendations
+#         })
+        
+#     except User.DoesNotExist:
+#         return JsonResponse({'error': 'User not found'}, status=404)
+>>>>>>> d2b4be574a6bbfa960917d50098ab4d4043d7c9a
