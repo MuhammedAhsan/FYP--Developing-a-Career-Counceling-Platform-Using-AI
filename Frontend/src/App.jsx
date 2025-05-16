@@ -8,6 +8,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Home } from './pages/Home';
 import { Chatbot } from './components/Chatbot';
 import { UserProvider } from './components/UserContext';
+import { SkillGap } from './components/SkillGap';
 
 export default function App() {
   // const [email, setEmail] = useState('');
@@ -63,6 +64,7 @@ export default function App() {
             <Route path='/home' element={<Home />} />
             <Route path='/chatbot' element={<Chatbot />} />
             <Route path='/recommendation' element={<CourseRecommendation/>}/>
+            <Route path='/skillgap' element={<SkillGap/>}/>
           </Route>
           <Route path='/login' element={<LoginPage />} />
           <Route path='/create-profile' element={<ProfileForm />} />

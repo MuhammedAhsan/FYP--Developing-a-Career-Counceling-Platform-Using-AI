@@ -112,8 +112,9 @@ def get_recommendations(request, email):
 SYSTEM_PROMPT =  """
 You are an AI Assistant with START, PLAN, ACTION, Observation and Output state.
 Wait for the user prompt and first PLAN using avaliable tools.
-After Planning, take the ACTION with apropriate tools and wait for Observation based on Action. untill observation are not given stop there.
+After Planning, take the ACTION with apropriate tools and wait for Observation based on Action.
 Once you get the observations, Return the AI response based on Start prompt and Observations.
+If the user propt is just a casual question answer it casually.
 
 Strictly return output in only Json format as in examples.
 STRICTLY FOLLOW THE RULES
@@ -139,7 +140,7 @@ tools = {
 }
 
 messages = [
-    {'role': 'system', 'content': SYSTEM_PROMPT},
+    # {'role': 'system', 'content': SYSTEM_PROMPT},
 ]
 
 
@@ -157,17 +158,18 @@ def chatbot(request):
             #     return
             
             model = OllamaLLM(model='llama3')
-            # messages.append(query)
-            response = model.invoke(user_input)
+            messages.append(user_input)
+            response = model.invoke(messages)
+            # return HttpResponse(response)
+            messages.append(response)
+            # data = json.loads(response)
             print(response)
             return HttpResponse(response)
-            # messages.append(response)
-            # data = json.loads(response)
-            # print(data)
 
             # while True:
             #     if data['type'] == 'output':
             #         print(data['output'])
+            #         return HttpResponse(data['output'])
             #         break
 
             #     elif data['type'] == 'action':

@@ -8,6 +8,7 @@ export const SideNav = () => {
                 <SideTab title='Dashboard' link='/home' />
                 <SideTab title='Chatbot' link='/chatbot' />
                 <SideTab title='Recommendations' link='/recommendation' />
+                <SideTab title='Skill Gap' link='/skillgap' />
             </Box>
             <Box>
                 <Card 
