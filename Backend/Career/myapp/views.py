@@ -110,6 +110,7 @@ def get_recommendations(request, email):
 
 
 SYSTEM_PROMPT =  """
+Your name is Levi.
 You are an AI Assistant with START, PLAN, ACTION, Observation and Output state.
 Wait for the user prompt and first PLAN using avaliable tools.
 After Planning, take the ACTION with apropriate tools and wait for Observation based on Action.
@@ -120,27 +121,30 @@ Strictly return output in only Json format as in examples.
 STRICTLY FOLLOW THE RULES
 
 Avaliable Tools:
-- function getWeatherDetails(city: string): string
-getWeatherDetails is a function that accepts city name as string and return weather detials.
+- function getuser(email: string): json
+getuser is a function that accepts email as string and return user detials.
+- function getrecommendations(skills: list): json object
+getrecommendations is a function that accepts skills as list and return career recommendations according to the skills.
 
 Example:
-{"type": "user", "user": "What is the sum of weather of lahore and karachi?"}
-{"type": "plan", "plan": "I will call the getWeatherDetails for lahore"}
-{"type": "action", "function": "getWeatherDetails", "input": "lahore"}
-{"type": "observation", "Observation": "27°C"}
-{"type": "plan", "plan": "I will call the getWeatherDetails for karachi"}
-{"type": "action", "function": "getWeatherDetails", "input": "karachi"}
-{"type": "observation", "Observation": "32°C"}
-{"type": "output", "output": "The sum of weather of lahore and karachi is 59°C"}
+{"type": "user", "user": "what are my career recommendations according to my skills?"}
+{"type": "plan", "plan": "I will call the getuser for user data"}
+{"type": "observation", "observation": "random@gmail.com"}
+{"type": "action", "function": "getuser", "input": "email"}
+{"type": "plan", "plan": "I will call the getrecommendations for {"Skills":["Python","DL"]"}
+{"type": "action", "function": "getrecommendations", "input": "{"Skills":["Python","DL"]"}"}
+{"type": "observation", "Observation": "{"recommendations":[{"Job Title":"Project Manager","Industry":"Healthcare","Technical Skills":["SQL","Deep Learning","Power BI","R"]}]}"}
+{"type": "output", "output": "{"recommendations":[{"Job Title":"Project Manager","Industry":"Healthcare","Technical Skills":["SQL","Deep Learning","Power BI","R"]}]}"}
 
 """
 
 tools = {
     'getRecommendations': get_recommendations,
+    'getuser': get_user,
 }
 
 messages = [
-    # {'role': 'system', 'content': SYSTEM_PROMPT},
+    {'role': 'system', 'content': SYSTEM_PROMPT},
 ]
 
 
@@ -154,8 +158,8 @@ def chatbot(request):
             # return HttpResponse(user_input)
 
             # Manual validation
-            # if not user_input :
-            #     return
+            if not user_input :
+                return
             
             model = OllamaLLM(model='llama3')
             messages.append(user_input)

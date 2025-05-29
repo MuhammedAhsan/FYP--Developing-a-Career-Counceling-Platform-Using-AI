@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, BrowserRouter } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, BrowserRouter, Navigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
 import ProfileForm from './pages/ProfileForm';
 import LoginPage from './pages/LoginPage';
@@ -57,14 +57,16 @@ export default function App() {
     //     </Routes>
     //   </Container>
     // </Router>
+
     <UserProvider>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Dashboard />}>
-            <Route path='/home' element={<Home />} />
-            <Route path='/chatbot' element={<Chatbot />} />
-            <Route path='/recommendation' element={<CourseRecommendation/>}/>
-            <Route path='/skillgap' element={<SkillGap/>}/>
+            <Route index element={<Navigate to="home" replace />} />
+            <Route path='home' element={<Home />} />
+            <Route path='chatbot' element={<Chatbot />} />
+            <Route path='recommendation' element={<CourseRecommendation />} />
+            <Route path='skillgap' element={<SkillGap />} />
           </Route>
           <Route path='/login' element={<LoginPage />} />
           <Route path='/create-profile' element={<ProfileForm />} />

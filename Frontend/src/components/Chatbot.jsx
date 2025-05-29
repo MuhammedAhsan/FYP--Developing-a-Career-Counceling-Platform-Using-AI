@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Paper, Stack } from '@mui/material';
+import { Box, TextField, Button, Typography, Stack } from '@mui/material';
 import axios from 'axios';
 
 export const Chatbot = () => {
@@ -52,7 +52,7 @@ export const Chatbot = () => {
                 Chatbot
             </Typography>
 
-            <Paper
+            <Box
                 elevation={1}
                 sx={{
                     flex: 1,
@@ -81,7 +81,7 @@ export const Chatbot = () => {
                         </Box>
                     ))}
                 </Stack>
-            </Paper>
+            </Box>
 
             <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
