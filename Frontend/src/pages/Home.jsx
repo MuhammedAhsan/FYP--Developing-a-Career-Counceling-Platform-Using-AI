@@ -1,5 +1,4 @@
 import { Box, Card, Typography } from '@mui/material'
-import React from 'react'
 import { useUser } from '../components/UserContext'
 
 export const Home = () => {
