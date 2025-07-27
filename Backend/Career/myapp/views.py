@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer
 from langchain_ollama import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
+# from langchain_core.prompts import ChatPromptTemplate
 
 
 csv_data = os.path.join(settings.BASE_DIR, 'dataset', 'Job_Skill_Recommendation.csv')
@@ -91,11 +91,12 @@ def get_recommendations(request, email):
     try:
         user = users_db.find_one({"email": email})
         user_skills = [skill['name'] for skill in user['skills']]
+        user_interests = [interest for interest in user['interests']]
 
-        if not user_skills:
-            return JsonResponse({'error': 'No Skill Provided'}, status=400)
+        if not user_skills and user_interests:
+            return JsonResponse({'error': 'No Skill and Interest Provided'}, status=400)
 
-        user_vector = mlb_tech.transform([user_skills])
+        user_vector = mlb_tech.transform([user_skills, user_interests])
         similarities = cosine_similarity(user_vector, job_skill_matrix)
         top_indicies = similarities[0].argsort()[::-1][:5]
         recommended_jobs = job_data.iloc[top_indicies]
@@ -159,7 +160,7 @@ def chatbot(request):
 
             # Manual validation
             if not user_input :
-                return
+                return JsonResponse({'message': 'No input provided'}, status=400)
             
             model = OllamaLLM(model='llama3')
             messages.append(user_input)

@@ -361,6 +361,15 @@ export default function ProfileForm() {
                     onChange={(e) => setFormData({ ...formData, career_goals: e.target.value })}
                   />
                 </Grid>
+
+                {/* <Grid>
+                  <TextField 
+                    fullWidth
+                    label='Education'
+                    rows={4}
+                    
+                  />
+                </Grid> */}
               </>
             )}
 

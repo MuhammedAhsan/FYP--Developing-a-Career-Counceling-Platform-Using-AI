@@ -18,7 +18,7 @@ export const Chatbot = () => {
                 message: input
             });
 
-            const botMessage = { sender: 'bot', text: res.data || "No reply" };
+            const botMessage = { sender: 'bot', text: res.data.response || "No reply" };
             setMessages((prev) => [...prev, botMessage]);
         } catch (err) {
             const botError = { sender: 'bot', text: "Error: Could not reach server." };
