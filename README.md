@@ -29,13 +29,13 @@ uv venv
 venv\scripts\activate
 ```
 
-Install Django
+Install Python Packages
 ```
-uv pip install Django
-```
-
-Install Django Core-Headers
-```
-uv pip install django-cors-headers
+uv pip install -r requirements.txt
 ```
 
+Run Backend
+```
+cd .\Career\
+python .\manage.py runserver
+```
