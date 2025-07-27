@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Typography, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import { useUser } from '../components/UserContext';
+import { useRecommendation } from '../components/RecommendationContext';
 
 export default function CourseRecommendation() {
   const { user } = useUser()
+  const { setRecommendation } = useRecommendation()
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,6 +28,7 @@ export default function CourseRecommendation() {
         // setRecommendations(jobs)
         // console.log(recommendations)
         // console.log(jobs)
+        setRecommendation(job_items)
 
         if (job_items && job_items.length > 0) {
           const jobs = job_items.map((item) => item['Job Title'])
@@ -42,12 +45,12 @@ export default function CourseRecommendation() {
     };
 
     fetchRecommendations();
-  }, [user?.email]);
+  }, []);
 
   return (
     <div style={{ padding: '20px' }}>
       <Typography variant="h4" gutterBottom>
-        Career Recommendations for <strong>{user?.email}</strong>
+        Career Recommendations for <strong>{user?.name}</strong>
       </Typography>
 
       {loading ? (
@@ -56,8 +59,8 @@ export default function CourseRecommendation() {
         <Typography color="error">{error}</Typography>
       ) : (
         <List>
-          {recommendations.map((career) => (
-            <ListItem key={Math.random()} divider>
+          {recommendations.map((career, index) => (
+            <ListItem key={index} divider>
               <ListItemText primary={career} />
             </ListItem>
           ))}

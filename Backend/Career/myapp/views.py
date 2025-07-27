@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -9,6 +8,9 @@ from django.conf import settings
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer
+from langchain_ollama import OllamaLLM
+# from langchain_core.prompts import ChatPromptTemplate
+
 
 csv_data = os.path.join(settings.BASE_DIR, 'dataset', 'Job_Skill_Recommendation.csv')
 job_data = pd.read_csv(csv_data)
@@ -25,18 +27,6 @@ job_skill_matrix = mlb_tech.fit_transform(job_data['Technical Skills'])
 #     "Web Developer": ["JavaScript", "HTML", "CSS"],
 #     "Cybersecurity Analyst": ["Networking", "Security", "Linux"]
 # }
-=======
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import User
-
-CAREER_PATHS = {
-    "Data Scientist": ["Python", "Machine Learning", "Statistics"],
-    "Web Developer": ["JavaScript", "HTML", "CSS"],
-    "Cybersecurity Analyst": ["Networking", "Security", "Linux"]
-}
->>>>>>> d2b4be574a6bbfa960917d50098ab4d4043d7c9a
 
 @csrf_exempt
 def create_user(request):
@@ -51,7 +41,6 @@ def create_user(request):
                     status=400
                 )
                 
-<<<<<<< HEAD
             user = {
                 "name": data['name'],
                 "email": data['email'],
@@ -62,16 +51,6 @@ def create_user(request):
                 "career_goals": data.get('career_goals', '')
             }
             users_db.insert_one(user)
-=======
-            User.objects.create(
-                name=data['name'],
-                email=data['email'],
-                education=data.get('education', []),
-                skills=data.get('skills', []),
-                interests=data.get('interests', []),
-                career_goals=data.get('career_goals', '')
-            )
->>>>>>> d2b4be574a6bbfa960917d50098ab4d4043d7c9a
             return JsonResponse({'status': 'success'})
             
         except Exception as e:
@@ -79,7 +58,6 @@ def create_user(request):
                 {'message': str(e)}, 
                 status=400
             )
-<<<<<<< HEAD
         
 @csrf_exempt
 def get_user(request):
@@ -113,11 +91,12 @@ def get_recommendations(request, email):
     try:
         user = users_db.find_one({"email": email})
         user_skills = [skill['name'] for skill in user['skills']]
+        user_interests = [interest for interest in user['interests']]
 
-        if not user_skills:
-            return JsonResponse({'error': 'No Skill Provided'}, status=400)
+        if not user_skills and user_interests:
+            return JsonResponse({'error': 'No Skill and Interest Provided'}, status=400)
 
-        user_vector = mlb_tech.transform([user_skills])
+        user_vector = mlb_tech.transform([user_skills, user_interests])
         similarities = cosine_similarity(user_vector, job_skill_matrix)
         top_indicies = similarities[0].argsort()[::-1][:5]
         recommended_jobs = job_data.iloc[top_indicies]
@@ -129,52 +108,83 @@ def get_recommendations(request, email):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-=======
-
-def get_recommendations(request, email):
-    try:
-        user = User.objects.get(email=email)
-        user_skills = [skill['name'] for skill in user.skills]
-        matches = []
-        
-        for career, skills in CAREER_PATHS.items():
-            if any(skill in user_skills for skill in skills):
-                matches.append(career)
-                
-        return JsonResponse({'recommendations': matches})
-    except User.DoesNotExist:
-        return JsonResponse({'status': 'user not found'}, status=404)
 
 
-# def get_recommendations(request, email):
-#     try:
-#         user = User.objects.get(email=email)
-#         user_skills = [skill['name'] for skill in user.skills]
-        
-#         recommendations = []
-#         CAREER_PATHS = {
-#             "Data Scientist": ["Python", "Machine Learning", "Statistics"],
-#             "Web Developer": ["JavaScript", "HTML", "CSS"]
-#         }
-        
-#         for career, required_skills in CAREER_PATHS.items():
-#             if any(skill in user_skills for skill in required_skills):
-#                 recommendations.append({
-#                     "career": career,
-#                     "required_skills": required_skills,
-#                     "user_skills_matched": [s for s in required_skills if s in user_skills],
-#                     "skills_missing": [s for s in required_skills if s not in user_skills]
-#                 })
+SYSTEM_PROMPT =  """
+Your name is Levi.
+You are an AI Assistant with START, PLAN, ACTION, Observation and Output state.
+Wait for the user prompt and first PLAN using avaliable tools.
+After Planning, take the ACTION with apropriate tools and wait for Observation based on Action.
+Once you get the observations, Return the AI response based on Start prompt and Observations.
+If the user propt is just a casual question answer it casually.
 
-#         return JsonResponse({
-#             'user': {
-#                 'name': user.name,
-#                 'email': user.email,
-#                 'skills': user.skills
-#             },
-#             'recommendations': recommendations
-#         })
-        
-#     except User.DoesNotExist:
-#         return JsonResponse({'error': 'User not found'}, status=404)
->>>>>>> d2b4be574a6bbfa960917d50098ab4d4043d7c9a
+Strictly return output in only Json format as in examples.
+STRICTLY FOLLOW THE RULES
+
+Avaliable Tools:
+- function getuser(email: string): json
+getuser is a function that accepts email as string and return user detials.
+- function getrecommendations(skills: list): json object
+getrecommendations is a function that accepts skills as list and return career recommendations according to the skills.
+
+Example:
+{"type": "user", "user": "what are my career recommendations according to my skills?"}
+{"type": "plan", "plan": "I will call the getuser for user data"}
+{"type": "observation", "observation": "random@gmail.com"}
+{"type": "action", "function": "getuser", "input": "email"}
+{"type": "plan", "plan": "I will call the getrecommendations for {"Skills":["Python","DL"]"}
+{"type": "action", "function": "getrecommendations", "input": "{"Skills":["Python","DL"]"}"}
+{"type": "observation", "Observation": "{"recommendations":[{"Job Title":"Project Manager","Industry":"Healthcare","Technical Skills":["SQL","Deep Learning","Power BI","R"]}]}"}
+{"type": "output", "output": "{"recommendations":[{"Job Title":"Project Manager","Industry":"Healthcare","Technical Skills":["SQL","Deep Learning","Power BI","R"]}]}"}
+
+"""
+
+tools = {
+    'getRecommendations': get_recommendations,
+    'getuser': get_user,
+}
+
+messages = [
+    {'role': 'system', 'content': SYSTEM_PROMPT},
+]
+
+
+@csrf_exempt
+def chatbot(request):
+    if request.method == 'POST':
+        try:
+            query = json.loads(request.body)
+            user_input = query.get('message')
+            # print(user_input)
+            # return HttpResponse(user_input)
+
+            # Manual validation
+            if not user_input :
+                return JsonResponse({'message': 'No input provided'}, status=400)
+            
+            model = OllamaLLM(model='llama3')
+            messages.append(user_input)
+            response = model.invoke(messages)
+            # return HttpResponse(response)
+            messages.append(response)
+            # data = json.loads(response)
+            print(response)
+            return HttpResponse(response)
+
+            # while True:
+            #     if data['type'] == 'output':
+            #         print(data['output'])
+            #         return HttpResponse(data['output'])
+            #         break
+
+            #     elif data['type'] == 'action':
+            #         fn = tools[data['function']]
+            #         observation = fn(data['input'])
+            #         obs = {'type': 'observation', 'observation': observation}
+            #         messages.append({'role': 'developer', 'content': json.dumps(obs)})
+
+        except Exception as e:
+            return JsonResponse(
+                {'message': str(e)}, 
+                status=400
+            )
